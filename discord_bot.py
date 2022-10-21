@@ -3,6 +3,8 @@ import discord
 import json
 import os
 from dotenv import load_dotenv
+import pymongo
+from pymongo import MongoClient
 
 # Get the path to the directory this file is in
 BASEDIR = os.path.abspath(os.path.dirname(__file__))
@@ -14,25 +16,29 @@ from keep_alive import keep_alive
 intents = discord.Intents.all()
 client = discord.Client(intents=intents)
 
+cluster = MongoClient("-")
+db = cluster["yaku"]
+
+collection_servers = db["servers"]
+collection_users = db["users"]
+
 
 @client.event
 async def on_ready():
     print(f'The {client.user.name} BOT has started working.')
-    roles = {}
-    members = {}
+
     for guild in client.guilds:
+        s_roles = {}
         for role in guild._roles.values():
             if role.name != "@everyone":
-                roles[role.id] = (guild.name, guild.id, role.name)
+                s_roles[role.id] = role.name
         for user in guild.members:
-            members[user.id] = (guild.name, guild.id, user.name)
-
-    print(members)
-    print(roles)
-
-
-# we can listen to any channel
-channels_to_read = ['announcements']
+            u_roles = {}
+            for role in user.roles:
+                if role.name != "@everyone":
+                    u_roles[role.id] = role.name
+            collection_users.insert_one({"_id": user.id, "name": user.name, "roles": u_roles})
+    collection_servers.insert_one({"_id": guild.id, "name": guild.name, "roles": s_roles})
 
 
 @client.event
