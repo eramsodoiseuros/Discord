@@ -30,18 +30,20 @@ async def on_ready():
     print(members)
     print(roles)
 
+
 # we can listen to any channel
 channels_to_read = ['announcements']
+
 
 @client.event
 async def on_message(message):
     if message.author == client.user:
         return
+    print(message.channel.type)
 
-    if message.channel.name in channels_to_read:
-        print(f'{message.author} said [{message.content}] in [{message.channel}].')
+    if message.channel.type.name == 'news':
+        print(f'{message.author} said [{message.content}] in the news channel [{message.channel}].')
 
 
 keep_alive()
 client.run(os.getenv('TOKEN'))
-
