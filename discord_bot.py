@@ -1,9 +1,8 @@
-import requests
 import discord
-import json
 import os
+
+from keep_alive import keep_alive
 from dotenv import load_dotenv
-import pymongo
 from pymongo import MongoClient
 
 # Get the path to the directory this file is in
@@ -11,7 +10,6 @@ BASEDIR = os.path.abspath(os.path.dirname(__file__))
 
 # Connect the path with your '.env' file name
 load_dotenv(os.path.join(BASEDIR, '.env'))
-from keep_alive import keep_alive
 
 intents = discord.Intents.all()
 client = discord.Client(intents=intents)
@@ -41,6 +39,9 @@ async def on_ready():
     collection_servers.insert_one({"_id": guild.id, "name": guild.name, "roles": s_roles})
 
 
+collection_announcements = db["announcements"]
+
+
 @client.event
 async def on_message(message):
     if message.author == client.user:
@@ -48,7 +49,9 @@ async def on_message(message):
     print(message.channel.type)
 
     if message.channel.type.name == 'news':
-        print(f'{message.author} said [{message.content}] in the news channel [{message.channel}].')
+        collection_announcements.insert_one({"_id": message.id, "author": message.author, "server_id": message.guild.id,
+                                           "server_name": message.guild.name, "channel": message.channel, "content": message.content})
+
 
 
 keep_alive()
