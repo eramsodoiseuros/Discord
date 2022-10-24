@@ -31,11 +31,18 @@ async def on_ready():
             if role.name != "@everyone":
                 s_roles[role.id] = role.name
         for user in guild.members:
+            x = collection_users.find({}, {"_id": user.id})
             u_roles = {}
+
             for role in user.roles:
                 if role.name != "@everyone":
                     u_roles[role.id] = role.name
-            collection_users.insert_one({"_id": user.id, "name": user.name, "roles": u_roles})
+
+            if user.name == x.name:
+                u_roles.update(x.roles)
+                collection_users.update_one({"_id": user.id}, {"roles": u_roles})
+            else:
+                collection_users.insert_one({"_id": user.id, "name": user.name, "roles": u_roles})
     collection_servers.insert_one({"_id": guild.id, "name": guild.name, "roles": s_roles})
 
 
