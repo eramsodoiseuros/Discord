@@ -34,3 +34,15 @@ Here's a high-level overview of the login process:
   4. If the login is successful, the `Discord API` redirects the user back to the website or application and issues a special token (called an `access token`) to the website or application.
 
   5. The website or application can use the access token to access the user's Discord account and perform actions on behalf of the user.
+
+# Servers in Discord
+
+Servers under the Discord API are called guilds and follow this format:
+
+- **id**: This is the unique ID of the server.
+- **name**: This is the name of the server.
+- **icon**: This is the hash of the icon for the server.
+- **owner**: This is a boolean value indicating whether the authenticated user is the owner of the server.
+- **permissions**: This is an integer representing the permissions of the authenticated user in the server.
+- **features**: This is a list of features enabled for the server.
+- **permissions_new**: This is a string representing the permissions of the authenticated user in the server.
