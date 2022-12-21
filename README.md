@@ -15,5 +15,22 @@ Next, the code uses the `Discord API` to update the bot's status with the Solana
 
 # Fetch.py
 
-This code attempts to retrieve a list of messages from a channel in a Discord server using the `Discord API`.
-It is using the `os.getenv` function to get the value of the `API_ENDPOINT` environment variable, which is the base URL of the `Discord API`. It then constructs the URL for the `/channels/{channel_id}/messages` endpoint using the `channel_id` argument passed to the `retrieve_messages` function and the `API_ENDPOINT` environment variable.
+This code uses `Logging in with Discord` special token - `access token` - to fetch important server infomations that the users has, such as list of servers, user roles in those servers and announcement channel messages in those servers.
+
+# Loggin in with Discord
+
+Logging in with Discord allows users to easily access their `Discord account` from other websites and applications. When a user logs in with Discord, they are redirected to the Discord login page, where they can enter their login credentials (`email address` and `password`).
+
+If the login is successful, the user is redirected back to the website or application that requested the login, and a special token is issued to the website or application. This token can then be used to access the user's Discord account and perform actions on behalf of the user.
+
+Here's a high-level overview of the login process:
+
+  1. The user clicks on the "Log in with Discord" button on the website or application.
+
+  2. The website or application sends a request to the Discord API to initiate the login process.
+
+  3. The `Discord API` redirects the user to the Discord login page, where they can enter their login credentials.
+
+  4. If the login is successful, the `Discord API` redirects the user back to the website or application and issues a special token (called an `access token`) to the website or application.
+
+  5. The website or application can use the access token to access the user's Discord account and perform actions on behalf of the user.
