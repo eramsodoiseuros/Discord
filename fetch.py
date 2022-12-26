@@ -6,6 +6,8 @@ import base64
 from cryptography.fernet import Fernet
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
+import pymongo
+import ssl
 
 load_dotenv()
 API_ENDPOINT = os.getenv('API_ENDPOINT')
@@ -35,6 +37,20 @@ encrypted_message = fernet.encrypt(message.encode('utf-8'))
 # STEP 5 - Decrypt the message
 decrypted_acc_token = fernet.decrypt(encrypted_message).decode('utf-8')
 
+# STEP 6 - Connect it to the Database
+client = pymongo.MongoClient("YOUR_DOCUMENTDB_URI",
+                             ssl=True,
+                             ssl_cert_reqs=ssl.CERT_NONE,
+                             authSource="admin",
+                             authMechanism='SCRAM-SHA-1',
+                             username='YOUR_DOCUMENTDB_USERNAME',
+                             password='YOUR_DOCUMENTDB_KEY')
+
+db = client["YOUR_DATABASE"]
+servers_collection = db["servers"]
+channels_collection = db["channels"]
+messages_collection = db["messages"]
+
 
 def retrieve_servers():
     """Returns a list of all user's servers"""
@@ -46,6 +62,7 @@ def retrieve_servers():
 
     if response.status_code == 200:
         servers = response.json()
+        servers_collection.insert_many(servers)
         return servers
     else:
         print(response.json())
@@ -64,10 +81,11 @@ def retrieve_announcement_channels(server):
     if response.status_code != 200:
         print(f"Failed to get list of channels from {server['name']}")
     else:
-        # Filter the results to only include announcement channels
         for channel in response.json():
+            # Filter the results to only include announcement channels (type 5)
             if channel["type"] == 5:
                 announcement_channels.append(channel)
+                channels_collection.insert_one(channel)
     return announcement_channels
 
 
@@ -79,7 +97,9 @@ def retrieve_messages(channel_id):
     }
 
     response = requests.get(f"{API_ENDPOINT}/channels/{channel_id}/messages", headers=headers)
-    return response.json()
+    messages = response.json()
+    messages_collection.insert_many(messages)
+    return messages
 
 
 """ TESTING """
